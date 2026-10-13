@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0b1622;
+    color: #f5f6f7;
+}
+
+header {
+    text-align: center;
+    padding: 1.5rem;
+    background: #18273a;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1.5rem;
+}
+
+.card {
+    background: linear-gradient(135deg, #1e2f45, #263d59);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 180px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card span {
+    display: block;
+    font-size: 2rem;
+    color: #00c3ff;
+}
+
+.chart-section, .report-section {
+    margin: 2rem auto;
+    width: 90%;
+    background: #132033;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+}
+table th, table td {
+    border-bottom: 1px solid #2b3a4e;
+    padding: 10px;
+    text-align: center;
+}
+table th {
+    background: #1f334b;
+}
+
+.btn-download {
+    display: inline-block;
+    background: linear-gradient(135deg, #00c3ff, #0088ff);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+.btn-download:hover {
+    background: linear-gradient(135deg, #00e1ff, #0099ff);
+    transform: scale(1.05);
+}

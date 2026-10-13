@@ -1,110 +1,116 @@
 # Energy Monitor IoT
 
-An IoT-based electrical energy monitoring system built with ESP32, PZEM-004T, MQTT, PHP, and MySQL.
+An IoT-based electrical energy monitoring prototype built with ESP32, PZEM-004T, MQTT, PHP, and MySQL.
 
 ## Overview
 
-Energy Monitor IoT is a prototype that collects electrical measurements, transmits them over a network, stores them in a database, and presents the data through a web dashboard.
-
-The project demonstrates the integration of embedded systems, electrical measurement, network communication, backend development, and database management in a single monitoring system.
+The system collects electrical measurements, transmits them over a local network, stores received data in a database, and presents the measurements through a web dashboard. It combines embedded systems, electrical measurement, network communication, backend development, and database management.
 
 ## Features
 
-- Collects electrical measurements through a PZEM-004T module.
-- Uses an ESP32 microcontroller for data acquisition and Wi-Fi connectivity.
-- Transmits measurement data using the MQTT messaging protocol.
-- Stores received measurements in a MySQL database.
-- Displays measurement data through a PHP-based web dashboard.
-- Supports reviewing historical measurements and generating reports.
+- Reads voltage, current, power, energy, frequency, and power factor using a PZEM-004T module.
+- Uses an ESP32 for data acquisition and Wi-Fi connectivity.
+- Publishes JSON measurement messages over MQTT.
+- Stores incoming measurements in MySQL through a PHP MQTT subscriber.
+- Displays the latest measurements and historical data through a PHP dashboard.
+- Provides a PDF report endpoint for recent measurements.
+- Includes selected PCB Gerber outputs and hardware documentation.
 
-## System Architecture
+## Architecture
 
 ```text
-PZEM-004T
-    |
-    v
-ESP32 Microcontroller
-    |
-    v
-Wi-Fi Network
-    |
-    v
-MQTT Broker
-    |
-    v
-PHP MQTT Subscriber
-    |
-    v
-MySQL Database
-    |
-    v
-Web Dashboard and Reports
+PZEM-004T -> ESP32 + LCD -> Wi-Fi / MQTT -> MQTT Broker
+                                            |
+                                            v
+                                  PHP MQTT Subscriber
+                                            |
+                                            v
+                                      MySQL Database
+                                            |
+                                            v
+                                PHP Dashboard + Reports
 ```
+
+See [`docs/architecture.md`](docs/architecture.md) for more detail.
 
 ## Technology Stack
 
-| Category | Technologies |
+| Area | Technologies |
 |---|---|
-| Embedded system | ESP32, Arduino framework |
-| Electrical measurement | PZEM-004T |
-| Connectivity | Wi-Fi |
-| Messaging | MQTT, Mosquitto |
-| Backend | PHP |
-| Database | MySQL |
-| Web interface | HTML, CSS, JavaScript |
-| Hardware documentation | Circuit schematic and PCB design files |
+| Embedded hardware | ESP32, PZEM-004T, I2C LCD |
+| Firmware | Arduino framework, WiFiManager, PubSubClient, PZEM004Tv30 |
+| Messaging | MQTT, Mosquitto-compatible broker |
+| Backend | PHP, `php-mqtt/client`, Dompdf |
+| Database | MySQL / MariaDB |
+| Web UI | HTML, CSS, JavaScript, Chart.js |
+| Hardware files | Selected Gerber manufacturing outputs |
 
 ## Repository Structure
 
 ```text
-energy-monitor-iot/
-├── firmware/       # ESP32 firmware
-├── dashboard/      # PHP web application and MQTT subscriber
-├── database/       # Database schema and safe sample data
-├── hardware/       # Circuit schematic and PCB documentation
-├── docs/           # Architecture diagrams and screenshots
-├── README.md
-└── .gitignore
+.
+├── firmware/
+│   ├── energy_monitor.ino
+│   └── config.example.h
+├── dashboard/
+│   ├── assets/style.css
+│   ├── config.example.php
+│   ├── db.php
+│   ├── composer.json
+│   └── *.php
+├── database/schema.sql
+├── hardware/
+│   └── pcb/gerber/  # selected fabrication outputs
+└── docs/architecture.md
 ```
-
-The repository structure may evolve as the project is organized and documented.
 
 ## Getting Started
 
-### Prerequisites
+### Requirements
 
-- ESP32 development board
-- PZEM-004T measurement module
-- Arduino IDE or a compatible ESP32 development environment
-- MQTT broker, such as Mosquitto
-- PHP and a web server, such as Apache through XAMPP
-- MySQL or a compatible database server
-- Composer for installing PHP dependencies
+- ESP32 development board, PZEM-004T module, and compatible LCD wiring.
+- Arduino IDE or another ESP32-compatible development environment.
+- MQTT broker reachable by both the ESP32 and PHP host.
+- PHP with the `mysqli` extension and a local web server, such as Apache/XAMPP.
+- MySQL or MariaDB.
+- Composer.
 
-### Setup
+### 1. Configure the ESP32 firmware
 
-1. **Prepare the firmware.** Open the project in your ESP32 development environment and install the libraries required by the source code.
-2. **Configure the network.** Set the appropriate Wi-Fi and MQTT broker settings for your environment. Do not commit private configuration or credentials.
-3. **Start the MQTT broker.** Ensure the ESP32 and the PHP subscriber can reach the broker over the network.
-4. **Prepare the database.** Create the required database and import the schema provided in `database/`.
-5. **Configure the dashboard.** Set the local database connection details using an untracked configuration file based on the provided example, if available.
-6. **Install PHP dependencies.** Run `composer install` in the dashboard directory.
-7. **Start the application.** Run the web server and MQTT subscriber, then open the dashboard through your local development environment.
+1. Copy `firmware/config.example.h` to `firmware/config.h`.
+2. Set `MQTT_SERVER` to the IP address or hostname of your MQTT broker.
+3. Change `WIFI_PORTAL_PASSWORD` to a unique local password.
+4. Install the libraries used by the sketch, then build and flash `firmware/energy_monitor.ino`.
+5. On first boot, use the Wi-FiManager setup access point to configure the ESP32 Wi-Fi connection.
 
-Configuration details may need adjustment depending on the hardware, network, and software environment.
+### 2. Configure the database and dashboard
 
-## Limitations
+1. Create a database named `energy_monitor` and a local database user with appropriate permissions.
+2. Import [`database/schema.sql`](database/schema.sql).
+3. Copy `dashboard/config.example.php` to `dashboard/config.php` and update the database and MQTT connection settings.
+4. From the `dashboard/` directory, run `composer install` to install PHP dependencies.
+5. Place `dashboard/` under your PHP web server's document root or configure a local virtual host.
+6. Start the MQTT broker and run `php mqtt_subscriber.php` while inside the `dashboard/` directory.
+7. Open the dashboard through your local web server.
 
-This project is a prototype intended for educational and development purposes. Its operation depends on the measurement module, Wi-Fi network, MQTT broker, database, and web server. Measurement accuracy, data continuity, and long-term reliability should be verified before practical deployment.
+The dashboard loads Chart.js from a pinned CDN URL, so an internet connection is required for the chart library. The MQTT monitoring pipeline uses your configured local network.
 
-## Safety Notice
+## Configuration and Data Hygiene
 
-Electrical measurement hardware may interface with hazardous mains voltage. Installation, wiring, and testing must follow appropriate electrical safety procedures and be performed with suitable supervision and equipment.
+Local connection settings are deliberately excluded from Git. Do not commit `firmware/config.h`, `dashboard/config.php`, real credentials, raw measurement dumps, local logs, or Composer's generated `vendor/` directory. The database file contains the schema only; historical measurement records are not included.
+
+## Limitations and Safety
+
+This is an educational prototype. Availability depends on the sensor, network, MQTT broker, PHP subscriber, and database. Validate measurement accuracy, units, and long-term reliability before relying on readings. Hardware connected to mains voltage can be hazardous; installation and testing must follow appropriate electrical safety procedures and supervision.
 
 ## Project Status
 
-**Prototype / Educational Project**
+Prototype / educational project.
 
-## License and Usage
+## Hardware Source Note
 
-This repository does not currently grant permission to redistribute or reuse its contents. A license should only be added once ownership and permission to publish the project have been confirmed.
+The repository currently contains selected Gerber output files, not the editable KiCad source project or a complete manufacturing package. Verify the required fabrication layers and review the design before ordering a board.
+
+## License
+
+No license is granted by this repository at this time. Confirm the right to redistribute the code and hardware files before sharing them outside the intended audience.
