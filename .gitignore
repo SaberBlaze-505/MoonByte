@@ -1,39 +1,42 @@
-# Environment variables and private configuration
+# Local-only firmware configuration
+firmware/config.h
+**/secrets.h
+**/config.local.*
+
+# Local dashboard settings and environment variables
+dashboard/config.php
 .env
 .env.*
 !.env.example
-**/secrets.h
-**/config.local.*
-dashboard/db.php
 
 # Dependencies
 **/vendor/
-composer.phar
+dashboard/composer.phar
 node_modules/
 
-# Logs
+# Logs and local data
 *.log
-logs.txt
-
-# Private database records and local database files
+**/logs.txt
 database/private/
 database/*-data.sql
+database/*-dump.sql
 *.sqlite
 *.sqlite3
+*.db
 
-# IDE and operating system files
+# IDE and OS files
 .vscode/
 .theia/
 .DS_Store
 Thumbs.db
 
-# Build artifacts
+# Build output and temporary files
 .pio/
 build/
 *.elf
 *.bin
-
-# Temporary files and raw archives
 *.tmp
 *.bak
+
+# Do not commit nested project archives
 *.zip
