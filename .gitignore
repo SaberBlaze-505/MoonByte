@@ -1,0 +1,39 @@
+# Environment variables and private configuration
+.env
+.env.*
+!.env.example
+**/secrets.h
+**/config.local.*
+dashboard/db.php
+
+# Dependencies
+**/vendor/
+composer.phar
+node_modules/
+
+# Logs
+*.log
+logs.txt
+
+# Private database records and local database files
+database/private/
+database/*-data.sql
+*.sqlite
+*.sqlite3
+
+# IDE and operating system files
+.vscode/
+.theia/
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+.pio/
+build/
+*.elf
+*.bin
+
+# Temporary files and raw archives
+*.tmp
+*.bak
+*.zip
